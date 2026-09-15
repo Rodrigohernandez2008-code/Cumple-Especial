@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¡Feliz Cumpleaños Natibebe! ❤️</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Quicksand:wght@500;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(135deg, #ffd1dc 0%, #ffe6eb 100%);
+      font-family: 'Quicksand', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #4a4a4a;
+      padding: 10px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 4px solid #ff9ebb;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(255, 105, 180, 0.2);
+      text-align: center;
+      position: relative;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    h1, h2 {
+      color: #ff5e83;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 14px;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+
+    p {
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .btn {
+      background-color: #ff7597;
+      color: white;
+      border: 3px solid #ff477e;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-family: 'Press Start 2P', cursive;
+      cursor: pointer;
+      margin: 8px 4px;
+      transition: transform 0.1s, background-color 0.2s;
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+    }
+
+    .btn-secondary {
+      background-color: #eee;
+      color: #555;
+      border-color: #ccc;
+    }
+
+    /* PANTALLA 1 */
+    .error-msg {
+      color: #e63946;
+      font-weight: bold;
+      font-size: 14px;
+      margin-top: 10px;
+      display: none;
+      animation: shake 0.3s;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+      100% { transform: translateX(0); }
+    }
+
+    /* LABERINTO */
+    #maze-board {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      grid-template-rows: repeat(7, 1fr);
+      gap: 2px;
+      width: 280px;
+      height: 280px;
+      margin: 15px auto;
+      background-color: #ffe0e9;
+      border: 3px solid #ff7597;
+      border-radius: 8px;
+      padding: 2px;
+    }
+
+    .cell {
+      border-radius: 3px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+    }
+
+    .wall {
+      background-color: #ff9ebb;
+    }
+
+    .path {
+      background-color: #fff;
+    }
+
+    /* CONTROLES TÁCTILES */
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, 45px);
+      grid-template-rows: repeat(2, 45px);
+      gap: 5px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .btn-ctrl {
+      background: #ffb6c1;
+      border: 2px solid #ff7597;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      color: white;
+    }
+
+    /* PANTALLA FINAL */
+    .photo-frame {
+      width: 100%;
+      border-radius: 15px;
+      border: 4px solid #ff7597;
+      overflow: hidden;
+      margin: 15px 0;
+    }
+
+    .photo-frame img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .dedicatory {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #4a4a4a;
+      background: #fff5f7;
+      padding: 15px;
+      border-radius: 12px;
+      border: 2px dashed #ffb6c1;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    audio {
+      width: 100%;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- PANTALLA 1: LA PREGUNTA -->
+    <div id="screen-1" class="screen active">
+      <h1>🌸 La Prueba 🌸</h1>
+      <p style="font-weight: bold; font-size: 18px; margin: 20px 0;">¿Quién cumple años hoy?</p>
+      
+      <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+        <button class="btn" onclick="goToMaze()">¡Yo! 💖</button>
+        <button class="btn btn-secondary" onclick="showError()">Yo no lo sé 🙈</button>
+      </div>
+
+      <div id="error-text" class="error-msg">
+        ¡¿Cómo no te vas a saber la fecha de tu cumpleaños?! 😡
+      </div>
+    </div>
+
+    <!-- PANTALLA 2: LABERINTO -->
+    <div id="screen-2" class="screen">
+      <h2>Nivel 1: Encuentra a Natibebe 🏃‍♂️❤️🏃‍♀️</h2>
+      <p style="font-size: 12px;">Usa las flechas para hacer que Rodrigo llegue con Natibebe</p>
+      
+      <div id="maze-board"></div>
+
+      <div class="controls">
+        <div></div>
+        <button class="btn-ctrl" onclick="movePlayer(0, -1)">▲</button>
+        <div></div>
+        <button class="btn-ctrl" onclick="movePlayer(-1, 0)">◀</button>
+        <button class="btn-ctrl" onclick="movePlayer(0, 1)">▼</button>
+        <button class="btn-ctrl" onclick="movePlayer(1, 0)">▶</button>
+      </div>
+    </div>
+
+    <!-- PANTALLA 3: MENSAJE INTERMEDIO -->
+    <div id="screen-3" class="screen">
+      <h1>¡Lo lograste! 🎉</h1>
+      <p style="font-size: 20px; font-weight: bold; color: #ff477e; margin: 25px 0;">
+        Te amo mi niña enojona ❤️
+      </p>
+      <button class="btn" onclick="goToFinal()">Continuar ✨</button>
+    </div>
+
+    <!-- PANTALLA 4: FINAL Y FOTO -->
+    <div id="screen-4" class="screen">
+      <h1>¡Feliz Cumpleaños Natibebe! 🎂</h1>
+      
+      <div class="photo-frame">
+        <!-- Reemplaza la ruta de la imagen si es necesario -->
+        <img src="foto.jpg" alt="Rodrigo y Natibebe">
+      </div>
+
+      <div class="dedicatory">
+        ¡Gracias por hacerme sentir tan lindo todos los días, te amo, te amo y te amo quiero que estemos juntos para siempre! ✨💖
+      </div>
+
+      <p style="font-size: 13px; color: #888;">Nuestra canción favorita 🎶</p>
+      
+      <!-- Reproductor de audio local (iris.mp3) -->
+      <audio controls autoplay loop>
+        <source src="iris.mp3" type="audio/mpeg">
+        Tu navegador no soporta el reproductor de audio.
+      </audio>
+    </div>
+
+  </div>
+
+  <script>
+    // Mostrar mensaje si presiona "Yo no lo sé"
+    function showError() {
+      document.getElementById('error-text').style.display = 'block';
+    }
+
+    function goToMaze() {
+      document.getElementById('screen-1').classList.remove('active');
+      document.getElementById('screen-2').classList.add('active');
+      initMaze();
+    }
+
+    function goToFinal() {
+      document.getElementById('screen-3').classList.remove('active');
+      document.getElementById('screen-4').classList.add('active');
+    }
+
+    // --- LÓGICA DEL LABERINTO (7x7) ---
+    const mazeMap = [
+      [0, 0, 1, 0, 0, 0, 0],
+      [1, 0, 1, 0, 1, 1, 0],
+      [0, 0, 0, 0, 0, 1, 0],
+      [0, 1, 1, 1, 0, 1, 0],
+      [0, 0, 0, 1, 0, 0, 0],
+      [1, 1, 0, 1, 1, 1, 0],
+      [0, 0, 0, 0, 0, 0, 0]
+    ]; // 0 = Camino, 1 = Pared
+
+    let playerPos = { x: 0, y: 0 };
+    const goalPos = { x: 6, y: 6 };
+
+    function initMaze() {
+      const board = document.getElementById('maze-board');
+      board.innerHTML = '';
+
+      for (let r = 0; r < 7; r++) {
+        for (let c = 0; c < 7; c++) {
+          const cell = document.createElement('div');
+          cell.id = `cell-${c}-${r}`;
+          cell.className = 'cell ' + (mazeMap[r][c] === 1 ? 'wall' : 'path');
+          board.appendChild(cell);
+        }
+      }
+      renderPositions();
+    }
+
+    function renderPositions() {
+      // Limpiar anteriores
+      document.querySelectorAll('.cell').forEach(c => {
+        if (c.textContent !== '🌸') c.textContent = '';
+      });
+
+      // Dibujar Rodrigo (👦)
+      const pCell = document.getElementById(`cell-${playerPos.x}-${playerPos.y}`);
+      if (pCell) pCell.textContent = '👦';
+
+      // Dibujar Natibebe (👧)
+      const gCell = document.getElementById(`cell-${goalPos.x}-${goalPos.y}`);
+      if (gCell) gCell.textContent = '👧';
+    }
+
+    function movePlayer(dx, dy) {
+      const newX = playerPos.x + dx;
+      const newY = playerPos.y + dy;
+
+      if (newX >= 0 && newX < 7 && newY >= 0 && newY < 7) {
+        if (mazeMap[newY][newX] === 0) {
+          playerPos.x = newX;
+          playerPos.y = newY;
+          renderPositions();
+
+          // Verificar si llegó al objetivo
+          if (playerPos.x === goalPos.x && playerPos.y === goalPos.y) {
+            setTimeout(() => {
+              document.getElementById('screen-2').classList.remove('active');
+              document.getElementById('screen-3').classList.add('active');
+            }, 300);
+          }
+        }
+      }
+    }
+
+    // Permitir movimiento también con teclado físico
+    window.addEventListener('keydown', (e) => {
+      if (!document.getElementById('screen-2').classList.contains('active')) return;
+      if (e.key === 'ArrowUp') movePlayer(0, -1);
+      if (e.key === 'ArrowDown') movePlayer(0, 1);
+      if (e.key === 'ArrowLeft') movePlayer(-1, 0);
+      if (e.key === 'ArrowRight') movePlayer(1, 0);
+    });
+  </script>
+
+</body>
+</html>
